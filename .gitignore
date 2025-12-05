@@ -1,1 +1,47 @@
-node_modules
+###############################
+# Node / Frontend
+###############################
+node_modules/
+dist/
+dist-ssr/
+*.local
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+###############################
+# Python / Backend
+###############################
+venv/
+backend/venv/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.cache/
+
+###############################
+# Env / Secrets
+###############################
+.env
+.env.*
+*.env
+
+###############################
+# Editors / OS
+###############################
+.vscode/
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
