@@ -74,14 +74,14 @@ export default function ManageClasses() {
               <Plus className="w-4 h-4 mr-2" /> Create Class
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-white dark:bg-gray-100 sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Create New Class</DialogTitle>
               <DialogDescription>
                 Add a new class to the system.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Class Name</Label>
                 <Input id="name" {...register("name")} placeholder="Introduction to AI" />
@@ -99,10 +99,11 @@ export default function ManageClasses() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lecturer_id">Lecturer ID</Label>
-                <Input id="lecturer_id" {...register("lecturer_id")} placeholder="Lecturer ID" />
+                <Input id="lecturer_id" {...register("lecturer_id")} placeholder="Lecturer ID" disabled className="bg-gray-100" />
                 {errors.lecturer_id && <p className="text-sm text-red-500">{errors.lecturer_id.message}</p>}
               </div>
-              <DialogFooter>
+              <DialogFooter className="mt-6">
+                <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
                 <Button type="submit">Create Class</Button>
               </DialogFooter>
             </form>

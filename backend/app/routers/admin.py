@@ -103,7 +103,7 @@ async def get_all_attendance(
     enriched_records = []
     for record in attendance_records:
         # Get user info
-        user = await db["users"].find_one({"_id": ObjectId(record["user_id"])})
+        user = await db["users"].find_one({"_id": ObjectId(record["student_id"])})
         # Get class info
         class_info = await db["classes"].find_one({"_id": ObjectId(record["class_id"])})
         
@@ -141,7 +141,7 @@ async def get_class_attendance(
     # Enrich with user information
     enriched_records = []
     for record in attendance_records:
-        user = await db["users"].find_one({"_id": ObjectId(record["user_id"])})
+        user = await db["users"].find_one({"_id": ObjectId(record["student_id"])})
         enriched_records.append({
             "_id": str(record["_id"]),
             "timestamp": record.get("timestamp"),
