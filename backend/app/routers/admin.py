@@ -110,8 +110,10 @@ async def get_all_attendance(
         enriched_records.append({
             "_id": str(record["_id"]),
             "timestamp": record.get("timestamp"),
-            "verified": record.get("verified", False),
-            "confidence": record.get("confidence", 0),
+            "status": record.get("status", "present"),
+            "verification_method": record.get("verification_method", "unknown"),
+            "confidence_score": record.get("confidence_score", 0),
+            "liveness_score": record.get("liveness_score", 0),
             "user": {
                 "_id": str(user["_id"]) if user else None,
                 "name": user.get("name") if user else "Unknown",
@@ -145,8 +147,10 @@ async def get_class_attendance(
         enriched_records.append({
             "_id": str(record["_id"]),
             "timestamp": record.get("timestamp"),
-            "verified": record.get("verified", False),
-            "confidence": record.get("confidence", 0),
+            "status": record.get("status", "present"),
+            "verification_method": record.get("verification_method", "unknown"),
+            "confidence_score": record.get("confidence_score", 0),
+            "liveness_score": record.get("liveness_score", 0),
             "user": {
                 "_id": str(user["_id"]) if user else None,
                 "name": user.get("name") if user else "Unknown",
