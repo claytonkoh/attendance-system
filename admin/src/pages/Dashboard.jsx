@@ -208,25 +208,25 @@ export default function AdminDashboard() {
           <CardDescription>Common administrative tasks</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Link to="/admin/classes">
+          <Link to="/classes">
             <Button variant="outline" className="w-full">
               <BookOpen className="mr-2 h-4 w-4" />
               Manage Classes
             </Button>
           </Link>
-          <Link to="/admin/users">
+          <Link to="/users">
             <Button variant="outline" className="w-full">
               <Users className="mr-2 h-4 w-4" />
               Manage Users
             </Button>
           </Link>
-          <Link to="/admin/attendance">
+          <Link to="/attendance">
             <Button variant="outline" className="w-full">
               <CheckCircle className="mr-2 h-4 w-4" />
               View Attendance
             </Button>
           </Link>
-          <Link to="/admin/reports">
+          <Link to="/reports">
             <Button variant="outline" className="w-full">
               <TrendingUp className="mr-2 h-4 w-4" />
               Generate Reports
