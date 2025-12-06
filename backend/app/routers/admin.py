@@ -102,16 +102,22 @@ async def get_all_attendance(
     # Enrich attendance records with user and class information
     enriched_records = []
     for record in attendance_records:
-        # Get user info
-        user = await db["users"].find_one({"_id": ObjectId(record["user_id"])})
+        # Skip records without student_id or class_id
+        if "student_id" not in record or "class_id" not in record:
+            continue
+
+        # Get user info - student_id in attendance is the user's _id
+        user = await db["users"].find_one({"_id": ObjectId(record["student_id"])})
         # Get class info
         class_info = await db["classes"].find_one({"_id": ObjectId(record["class_id"])})
         
         enriched_records.append({
             "_id": str(record["_id"]),
             "timestamp": record.get("timestamp"),
-            "verified": record.get("verified", False),
-            "confidence": record.get("confidence", 0),
+            "status": record.get("status", "present"),
+            "verification_method": record.get("verification_method", "unknown"),
+            "confidence_score": record.get("confidence_score", 0),
+            "liveness_score": record.get("liveness_score", 0),
             "user": {
                 "_id": str(user["_id"]) if user else None,
                 "name": user.get("name") if user else "Unknown",
@@ -141,12 +147,19 @@ async def get_class_attendance(
     # Enrich with user information
     enriched_records = []
     for record in attendance_records:
-        user = await db["users"].find_one({"_id": ObjectId(record["user_id"])})
+        # Skip if no student_id
+        if "student_id" not in record:
+            continue
+            
+        # Get user info - student_id in attendance is the user's _id
+        user = await db["users"].find_one({"_id": ObjectId(record["student_id"])})
         enriched_records.append({
             "_id": str(record["_id"]),
             "timestamp": record.get("timestamp"),
-            "verified": record.get("verified", False),
-            "confidence": record.get("confidence", 0),
+            "status": record.get("status", "present"),
+            "verification_method": record.get("verification_method", "unknown"),
+            "confidence_score": record.get("confidence_score", 0),
+            "liveness_score": record.get("liveness_score", 0),
             "user": {
                 "_id": str(user["_id"]) if user else None,
                 "name": user.get("name") if user else "Unknown",

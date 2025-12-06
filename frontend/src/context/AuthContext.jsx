@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
-import api from '../services/api';
+import { createContext, useContext, useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import api from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await api.get('/auth/me');
+      const response = await api.get("/auth/me");
       setUser(response.data);
     } catch (error) {
       console.error("Failed to fetch user", error);
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
@@ -41,30 +41,33 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const formData = new FormData();
-    formData.append('username', email); 
-    formData.append('password', password);
+    formData.append("username", email);
+    formData.append("password", password);
 
-    const response = await api.post('/auth/login', formData, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    const response = await api.post("/auth/login", formData, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
     const { access_token } = response.data;
-    localStorage.setItem('token', access_token);
+    localStorage.setItem("token", access_token);
     await fetchUser();
+    // Return user after it's been fetched
+    const userResponse = await api.get("/auth/me");
+    return userResponse.data;
   };
 
   const register = async (userData) => {
     const formData = new FormData();
-    Object.keys(userData).forEach(key => {
-        formData.append(key, userData[key]);
+    Object.keys(userData).forEach((key) => {
+      formData.append(key, userData[key]);
     });
-    
-    await api.post('/auth/register', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+
+    await api.post("/auth/register", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
   };
 

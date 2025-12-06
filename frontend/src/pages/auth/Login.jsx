@@ -1,98 +1,181 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { toast } from 'sonner'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(1, { message: "Password is required" }),
-})
+});
+
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.3, ease: "easeOut" },
+  },
+};
 
 export default function Login() {
-  const { login } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [isLoading, setIsLoading] = useState(false)
-  
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(loginSchema)
-  })
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
 
   const onSubmit = async (data) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const user = await login(data.email, data.password)
-      toast.success("Logged in successfully")
-      // Navigation is handled in AuthContext or we can do it here based on role if login returns user
-      // But login returns decoded token which might not have role.
-      // We rely on AuthContext fetching user. 
-      // Actually, since we await login, and login fetches user, we can check user state or just redirect.
-      // But user state update might be async.
-      // Let's assume login returns the decoded token.
-      // If we want to redirect based on role, we should probably wait for user state to update or fetch user here.
-      // For now, let's just redirect to a default and let ProtectedRoute handle it or redirect based on what we know.
-      // If login returns user object (from fetchUser), that would be better.
-      // Let's update AuthContext to return user object.
-      
-      // For now, I'll just navigate to /student/dashboard and let the user navigate if they are admin, 
-      // or better, I'll navigate to root / which redirects based on role if I implement a root redirector.
-      navigate("/")
+      const user = await login(data.email, data.password);
+      const token = localStorage.getItem("token");
+      toast.success("Logged in successfully");
+
+      // Redirect based on user role
+      if (user?.role === "admin") {
+        // Clear token from localhost:5173 before redirecting to localhost:5174
+        localStorage.removeItem("token");
+        // Redirect to admin panel at localhost:5174 with token as query param
+        window.location.href = `http://localhost:5174/dashboard?token=${token}`;
+        return; // Prevent further execution
+      } else if (user?.role === "lecturer") {
+        // Redirect to lecturer dashboard
+        navigate("/");
+      } else {
+        // Default: student dashboard
+        navigate("/student/dashboard");
+      }
     } catch (error) {
-      console.error(error)
-      toast.error("Invalid email or password")
+      console.error(error);
+      toast.error("Invalid email or password");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
-          <CardDescription className="text-center">
-            Enter your email and password to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="m@example.com" 
-                {...register("email")} 
-              />
-              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                {...register("password")} 
-              />
-              {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            Don't have an account? <Link to="/signup" className="text-primary hover:underline">Sign up</Link>
-          </p>
-        </CardFooter>
-      </Card>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full max-w-md"
+      >
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">
+              Login
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter your email and password to access your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <motion.div className="space-y-2" variants={itemVariants}>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  {...register("email")}
+                  className={`transition-all duration-300 ${
+                    errors.email
+                      ? "border-red-500 animate-shake"
+                      : "focus:scale-[1.01]"
+                  }`}
+                />
+                <AnimatePresence>
+                  {errors.email && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-sm text-red-500"
+                    >
+                      {errors.email.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+              <motion.div className="space-y-2" variants={itemVariants}>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  {...register("password")}
+                  className={`transition-all duration-300 ${
+                    errors.password
+                      ? "border-red-500 animate-shake"
+                      : "focus:scale-[1.01]"
+                  }`}
+                />
+                <AnimatePresence>
+                  {errors.password && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-sm text-red-500"
+                    >
+                      {errors.password.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </Button>
+              </motion.div>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <p className="text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <Link to="/signup" className="text-primary hover:underline">
+                Sign up
+              </Link>
+            </p>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
-  )
+  );
 }
