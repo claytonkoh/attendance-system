@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from fastapi.security import OAuth2PasswordRequestForm
+from typing import List
 from app.core.security import create_access_token, get_password_hash, verify_password
 from app.db.mongodb import get_database
 from app.models.user import UserCreate, UserResponse, UserInDB
@@ -17,26 +18,54 @@ async def register(
     password: str = Form(...),
     student_id: str = Form(...),
     major: str = Form(...),
-    file: UploadFile = File(...),
+    files: List[UploadFile] = File(...),  # Changed to accept multiple files (5 samples)
     db = Depends(get_database)
 ):
+    """
+    Register a new user with 5-sample enrollment (matching siamese.ipynb logic)
+    
+    Process:
+    1. Capture 5 face samples from the user
+    2. Generate embedding for each sample using DeepFace/Facenet
+    3. Average the 5 embeddings to create the final enrollment embedding
+    4. Store both individual embeddings and averaged embedding
+    """
     try:
         print(f"Registering user: {email}")
+        
+        # Validate that exactly 5 samples were provided
+        if len(files) != 5:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Exactly 5 face samples required for enrollment. Received {len(files)} samples."
+            )
+        
         # Check if user exists
         if await db["users"].find_one({"email": email}):
             raise HTTPException(status_code=400, detail="Email already registered")
 
-        # Save profile image
-        print("Saving file...")
-        file_path = await save_upload_file(file)
-        print(f"File saved at {file_path}")
+        # Save the first profile image (or you could create a composite)
+        print("Saving first file as profile image...")
+        file_path = await save_upload_file(files[0])
+        print(f"Profile image saved at {file_path}")
         
-        # Get face embedding
-        # In real app, read file bytes
-        print("Getting face embedding...")
-        file.file.seek(0)
-        content = await file.read()
-        embedding = ml_service.get_face_embedding(content)
+        # Process all 5 enrollment samples
+        print("Processing 5 enrollment samples...")
+        image_bytes_list = []
+        for i, file in enumerate(files):
+            file.file.seek(0)
+            content = await file.read()
+            image_bytes_list.append(content)
+            print(f"✅ Sample {i+1}/5 processed")
+        
+        # Get embeddings using ML service (mimics siamese.ipynb enrollment)
+        print("Generating embeddings from samples...")
+        enrollment_result = ml_service.process_enrollment_samples(image_bytes_list)
+        
+        individual_embeddings = enrollment_result["individual_embeddings"]
+        averaged_embedding = enrollment_result["averaged_embedding"]
+        
+        print(f"✨ Enrollment complete: {enrollment_result['sample_count']} samples averaged")
 
         user_dict = {
             "name": name,
@@ -46,7 +75,8 @@ async def register(
             "major": major,
             "role": "student",
             "profile_image_url": file_path,
-            "face_embedding": embedding
+            "face_embedding": averaged_embedding,  # The averaged embedding for verification
+            "enrollment_embeddings": individual_embeddings  # Store all 5 individual embeddings
         }
         
         print("Inserting into DB...")
@@ -54,8 +84,7 @@ async def register(
         print(f"User inserted with ID: {new_user.inserted_id}")
         
         created_user = await db["users"].find_one({"_id": new_user.inserted_id})
-        print(f"Retrieved user: {created_user}")
-        print("User registered successfully")
+        print(f"✅ Student {student_id} successfully enrolled with 5 samples")
         
         # Return simplified response
         return {
