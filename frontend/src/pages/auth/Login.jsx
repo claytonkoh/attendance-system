@@ -88,7 +88,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4">
+    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)] px-4 py-8">
       <motion.div
         variants={containerVariants}
         initial="hidden"

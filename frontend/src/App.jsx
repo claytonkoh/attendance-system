@@ -20,8 +20,19 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          {/* Guest / Auth Routes with Layout */}
+          <Route element={<DashboardLayout role="guest" />}>
+            <Route
+              index
+              element={<ProtectedRoute role="student" showLoginPrompt={true} />}
+            />
+            <Route
+              path="/"
+              element={<ProtectedRoute role="student" showLoginPrompt={true} />}
+            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Route>
 
           {/* Public / Student Routes */}
           <Route path="/student" element={<DashboardLayout role="student" />}>
@@ -51,12 +62,6 @@ function App() {
             />
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
-
-          {/* Root Redirect */}
-          <Route
-            path="/"
-            element={<Navigate to="/student/dashboard" replace />}
-          />
         </Routes>
       </Router>
     </AuthProvider>
