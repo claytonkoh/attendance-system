@@ -86,12 +86,14 @@ export default function Signup() {
     const imageSrc = webcamRef.current.getScreenshot();
     if (imageSrc) {
       setCapturedImages((prev) => [...prev, imageSrc]);
-      
+
       // Flash effect
       setShowFlash(true);
       setTimeout(() => setShowFlash(false), 300);
-      
-      toast.success(`✅ Sample ${capturedImages.length + 1}/${REQUIRED_SAMPLES} captured!`);
+
+      toast.success(
+        `✅ Sample ${capturedImages.length + 1}/${REQUIRED_SAMPLES} captured!`
+      );
     }
   }, [capturedImages.length]);
 
@@ -107,7 +109,9 @@ export default function Signup() {
 
   const onSubmit = async (data) => {
     if (capturedImages.length !== REQUIRED_SAMPLES) {
-      toast.error(`Please capture exactly ${REQUIRED_SAMPLES} face samples for enrollment`);
+      toast.error(
+        `Please capture exactly ${REQUIRED_SAMPLES} face samples for enrollment`
+      );
       return;
     }
 
@@ -118,7 +122,9 @@ export default function Signup() {
         capturedImages.map(async (image, index) => {
           const res = await fetch(image);
           const blob = await res.blob();
-          return new File([blob], `sample_${index + 1}.jpg`, { type: "image/jpeg" });
+          return new File([blob], `sample_${index + 1}.jpg`, {
+            type: "image/jpeg",
+          });
         })
       );
 
@@ -129,7 +135,7 @@ export default function Signup() {
       formData.append("password", data.password);
       formData.append("student_id", data.student_id);
       formData.append("major", data.major);
-      
+
       // Append all 5 files
       files.forEach((file) => {
         formData.append("files", file);
@@ -146,7 +152,9 @@ export default function Signup() {
         throw new Error(error.detail || "Registration failed");
       }
 
-      toast.success("✨ Account created successfully with 5 samples! Please login.");
+      toast.success(
+        "✨ Account created successfully with 5 samples! Please login."
+      );
       navigate("/login");
     } catch (error) {
       console.error(error);
@@ -157,12 +165,12 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4 py-8">
+    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)] px-4 py-6">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-2xl"
+        className="w-full max-w-4xl"
       >
         <Card>
           <CardHeader className="space-y-1">
@@ -170,259 +178,304 @@ export default function Signup() {
               Create an Account
             </CardTitle>
             <CardDescription className="text-center">
-              Enter your details and capture {REQUIRED_SAMPLES} face samples for enrollment
+              Enter your details and capture {REQUIRED_SAMPLES} face samples for
+              enrollment
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <motion.div className="space-y-2" variants={itemVariants}>
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    {...register("name")}
-                    className="transition-all duration-300 focus:scale-[1.01]"
-                  />
-                  <AnimatePresence>
-                    {errors.name && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors.name.message}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-                <motion.div className="space-y-2" variants={itemVariants}>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    {...register("email")}
-                    className="transition-all duration-300 focus:scale-[1.01]"
-                  />
-                  <AnimatePresence>
-                    {errors.email && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors.email.message}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-                <motion.div className="space-y-2" variants={itemVariants}>
-                  <Label htmlFor="student_id">Student ID</Label>
-                  <Input
-                    id="student_id"
-                    {...register("student_id")}
-                    className="transition-all duration-300 focus:scale-[1.01]"
-                  />
-                  <AnimatePresence>
-                    {errors.student_id && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors.student_id.message}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-                <motion.div className="space-y-2" variants={itemVariants}>
-                  <Label htmlFor="major">Major</Label>
-                  <Input
-                    id="major"
-                    {...register("major")}
-                    className="transition-all duration-300 focus:scale-[1.01]"
-                  />
-                  <AnimatePresence>
-                    {errors.major && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="text-sm text-red-500"
-                      >
-                        {errors.major.message}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-9">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+                {/* Left Column: Form Fields */}
+                <div className="space-y-4 md:col-span-2">
+                  <motion.div className="space-y-2" variants={itemVariants}>
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      {...register("name")}
+                      className={`transition-all duration-300 ${
+                        errors.name
+                          ? "border-red-500 animate-shake"
+                          : "focus:scale-[1.01]"
+                      }`}
+                    />
+                    <AnimatePresence>
+                      {errors.name && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-sm text-red-500"
+                        >
+                          {errors.name.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                  <motion.div className="space-y-2" variants={itemVariants}>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      {...register("email")}
+                      className={`transition-all duration-300 ${
+                        errors.email
+                          ? "border-red-500 animate-shake"
+                          : "focus:scale-[1.01]"
+                      }`}
+                    />
+                    <AnimatePresence>
+                      {errors.email && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-sm text-red-500"
+                        >
+                          {errors.email.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                  <motion.div className="space-y-2" variants={itemVariants}>
+                    <Label htmlFor="student_id">Student ID</Label>
+                    <Input
+                      id="student_id"
+                      {...register("student_id")}
+                      className={`transition-all duration-300 ${
+                        errors.student_id
+                          ? "border-red-500 animate-shake"
+                          : "focus:scale-[1.01]"
+                      }`}
+                    />
+                    <AnimatePresence>
+                      {errors.student_id && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-sm text-red-500"
+                        >
+                          {errors.student_id.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                  <motion.div className="space-y-2" variants={itemVariants}>
+                    <Label htmlFor="major">Major</Label>
+                    <Input
+                      id="major"
+                      {...register("major")}
+                      className={`transition-all duration-300 ${
+                        errors.major
+                          ? "border-red-500 animate-shake"
+                          : "focus:scale-[1.01]"
+                      }`}
+                    />
+                    <AnimatePresence>
+                      {errors.major && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-sm text-red-500"
+                        >
+                          {errors.major.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                  <motion.div className="space-y-2" variants={itemVariants}>
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      {...register("password")}
+                      className={`transition-all duration-300 ${
+                        errors.password
+                          ? "border-red-500 animate-shake"
+                          : "focus:scale-[1.01]"
+                      }`}
+                    />
+                    <AnimatePresence>
+                      {errors.password && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-sm text-red-500"
+                        >
+                          {errors.password.message}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </div>
+
+                {/* Right Column: Enrollment Section */}
                 <motion.div
-                  className="space-y-2 md:col-span-2"
+                  className="space-y-3 md:col-span-3"
                   variants={itemVariants}
                 >
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    {...register("password")}
-                    className="transition-all duration-300 focus:scale-[1.01]"
-                  />
-                  <AnimatePresence>
-                    {errors.password && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="text-sm text-red-500"
+                  <div className="flex items-center justify-between h-9">
+                    <Label className="text-base font-semibold">
+                      Face Enrollment ({capturedImages.length}/
+                      {REQUIRED_SAMPLES})
+                    </Label>
+                    {capturedImages.length > 0 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={clearAll}
                       >
-                        {errors.password.message}
-                      </motion.p>
+                        Clear All
+                      </Button>
                     )}
-                  </AnimatePresence>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <motion.div
+                      className="bg-primary h-2 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${
+                          (capturedImages.length / REQUIRED_SAMPLES) * 100
+                        }%`,
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+
+                  {/* Webcam Section */}
+                  <div className="border-2 border-dashed rounded-lg p-3 bg-muted/50">
+                    <div className="relative">
+                      <Webcam
+                        audio={false}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        className="rounded-lg w-full max-h-60 object-fill"
+                        videoConstraints={{ facingMode: "user" }}
+                      />
+
+                      {/* Flash Effect */}
+                      <AnimatePresence>
+                        {showFlash && (
+                          <motion.div
+                            variants={flashVariants}
+                            initial="initial"
+                            animate="flash"
+                            className="absolute inset-0 bg-white rounded-lg pointer-events-none"
+                          />
+                        )}
+                      </AnimatePresence>
+
+                      {/* Sample Counter Overlay */}
+                      <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        {capturedImages.length}/{REQUIRED_SAMPLES}
+                      </div>
+                    </div>
+
+                    {/* Capture Button */}
+                    <div className="mt-3 flex justify-center">
+                      <Button
+                        type="button"
+                        onClick={capture}
+                        disabled={capturedImages.length >= REQUIRED_SAMPLES}
+                        className="w-full"
+                        size="sm"
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        {capturedImages.length >= REQUIRED_SAMPLES
+                          ? "All Captured"
+                          : `Capture ${capturedImages.length + 1}`}
+                      </Button>
+                    </div>
+                  </div>
                 </motion.div>
               </div>
 
-              {/* Enrollment Section */}
-              <motion.div className="space-y-4" variants={itemVariants}>
-                <div className="flex items-center justify-between">
-                  <Label className="text-lg font-semibold">
-                    Face Enrollment ({capturedImages.length}/{REQUIRED_SAMPLES} samples)
-                  </Label>
-                  {capturedImages.length > 0 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={clearAll}
+              {/* Captured Samples Grid - Below both columns */}
+              {capturedImages.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="grid grid-cols-5 gap-2"
+                >
+                  {capturedImages.map((img, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="relative group"
                     >
-                      Clear All
-                    </Button>
-                  )}
-                </div>
-
-                {/* Progress Bar */}
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <motion.div
-                    className="bg-primary h-2 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(capturedImages.length / REQUIRED_SAMPLES) * 100}%` }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-
-                <div className="border-2 border-dashed rounded-lg p-4 bg-muted/50">
-                  <div className="relative">
-                    <Webcam
-                      audio={false}
-                      ref={webcamRef}
-                      screenshotFormat="image/jpeg"
-                      className="rounded-lg w-full max-h-64 object-cover"
-                      videoConstraints={{ facingMode: "user" }}
-                    />
-                    
-                    {/* Flash Effect */}
-                    <AnimatePresence>
-                      {showFlash && (
-                        <motion.div
-                          variants={flashVariants}
-                          initial="initial"
-                          animate="flash"
-                          className="absolute inset-0 bg-white rounded-lg pointer-events-none"
-                        />
-                      )}
-                    </AnimatePresence>
-
-                    {/* Sample Counter Overlay */}
-                    <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {capturedImages.length}/{REQUIRED_SAMPLES}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex justify-center">
-                    <Button
-                      type="button"
-                      onClick={capture}
-                      disabled={capturedImages.length >= REQUIRED_SAMPLES}
-                      className="w-full md:w-auto"
-                    >
-                      <Camera className="w-4 h-4 mr-2" />
-                      {capturedImages.length >= REQUIRED_SAMPLES
-                        ? "All Samples Captured"
-                        : `Capture Sample ${capturedImages.length + 1}`}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Captured Samples Grid */}
-                {capturedImages.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="grid grid-cols-5 gap-2"
-                  >
-                    {capturedImages.map((img, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="relative group"
+                      <img
+                        src={img}
+                        alt={`Sample ${index + 1}`}
+                        className="w-full h-20 object-fill rounded border-2 border-primary"
+                      />
+                      <div className="absolute top-0 right-0 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                        {index + 1}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => retake(index)}
                       >
-                        <img
-                          src={img}
-                          alt={`Sample ${index + 1}`}
-                          className="w-full h-20 object-cover rounded border-2 border-primary"
-                        />
-                        <div className="absolute top-0 right-0 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                          {index + 1}
-                        </div>
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => retake(index)}
-                        >
-                          <RefreshCw className="w-3 h-3" />
-                        </Button>
-                      </motion.div>
-                    ))}
-                    
-                    {/* Empty Slots */}
-                    {[...Array(REQUIRED_SAMPLES - capturedImages.length)].map((_, index) => (
+                        <RefreshCw className="w-3 h-3" />
+                      </Button>
+                    </motion.div>
+                  ))}
+
+                  {/* Empty Slots */}
+                  {[...Array(REQUIRED_SAMPLES - capturedImages.length)].map(
+                    (_, index) => (
                       <div
                         key={`empty-${index}`}
                         className="w-full h-20 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded flex items-center justify-center text-gray-400"
                       >
                         {capturedImages.length + index + 1}
                       </div>
-                    ))}
-                  </motion.div>
-                )}
+                    )
+                  )}
+                </motion.div>
+              )}
 
-                {capturedImages.length === REQUIRED_SAMPLES && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 font-semibold"
-                  >
-                    <CheckCircle2 className="w-5 h-5" />
-                    ✨ All samples captured! Ready to enroll.
-                  </motion.div>
-                )}
-              </motion.div>
+              {/* Success Message */}
+              {capturedImages.length === REQUIRED_SAMPLES && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 font-semibold"
+                >
+                  <CheckCircle2 className="w-5 h-5" />✨ All samples captured!
+                  Ready to enroll.
+                </motion.div>
+              )}
 
+              {/* Submit Button */}
               <motion.div variants={itemVariants}>
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isLoading || capturedImages.length !== REQUIRED_SAMPLES}
+                  disabled={
+                    isLoading || capturedImages.length !== REQUIRED_SAMPLES
+                  }
                 >
                   {isLoading
                     ? "Creating Account..."
                     : capturedImages.length === REQUIRED_SAMPLES
                     ? "Complete Enrollment"
-                    : `Capture ${REQUIRED_SAMPLES - capturedImages.length} more sample(s)`}
+                    : `Capture ${
+                        REQUIRED_SAMPLES - capturedImages.length
+                      } more sample(s)`}
                 </Button>
               </motion.div>
             </form>

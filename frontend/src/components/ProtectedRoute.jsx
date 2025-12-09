@@ -55,8 +55,7 @@ const ProtectedRoute = ({ children, role, showLoginPrompt = false }) => {
   }
 
   if (role && user.role !== role) {
-    // Redirect to student dashboard if user doesn't have required role
-    return <Navigate to="/student/dashboard" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

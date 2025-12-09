@@ -44,7 +44,7 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">My Classes</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">My Classes</h1>
         <Button asChild>
           <Link to="/student/classes">Browse Classes</Link>
         </Button>
