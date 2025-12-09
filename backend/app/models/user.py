@@ -17,7 +17,8 @@ class UserCreate(UserBase):
 class UserInDB(UserBase):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     hashed_password: str
-    face_embedding: Optional[List[float]] = None # Stored embedding from ML service
+    face_embedding: Optional[List[float]] = None # Averaged embedding from 5 enrollment samples
+    enrollment_embeddings: Optional[List[List[float]]] = None # All 5 individual embeddings from enrollment
     
     model_config = ConfigDict(
         populate_by_name=True,
