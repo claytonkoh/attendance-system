@@ -5,11 +5,26 @@ import numpy as np
 import cv2
 from deepface import DeepFace
 
+import os
+import tensorflow as tf
+
 class MLService:
     def __init__(self):
         self.base_url = settings.ML_SERVICE_URL
         self.REQUIRED_SAMPLES = 5  # Number of samples required for enrollment
-
+        
+        # Load custom fine-tuned model if available
+        self.verifier_model = None
+        try:
+            model_path = os.path.join(os.getcwd(), "app", "ml_models", "face_verifier.keras")
+            if os.path.exists(model_path):
+                self.verifier_model = tf.keras.models.load_model(model_path)
+                print(f"✨ Loaded custom fine-tuned verification model from {model_path}")
+            else:
+                print("⚠️  No custom fine-tuned model found. Using standard cosine similarity.")
+        except Exception as e:
+            print(f"⚠️  Failed to load custom model: {e}. Using standard cosine similarity.")
+            
     def get_face_embedding(self, image_bytes: bytes) -> List[float]:
         """
         Generate face embedding using DeepFace with Facenet model.
@@ -88,7 +103,24 @@ class MLService:
             # Get embedding from verification image using DeepFace
             current_embedding = self.get_face_embedding(image_bytes)
             
-            # Calculate cosine similarity (exactly like notebook)
+            # Use custom model if available
+            if self.verifier_model:
+                 # Prepare input for model: Abs Diff
+                diff = np.abs(np.array(current_embedding) - np.array(stored_embedding))
+                diff = diff.reshape(1, 128) # Reshape for batch size 1
+                
+                # Predict
+                prob = float(self.verifier_model.predict(diff, verbose=0)[0][0])
+                verified = prob > 0.5
+                
+                return {
+                    "verified": verified,
+                    "confidence": prob, # Probability from Neural Network
+                    "similarity": prob, 
+                    "method": "custom_neural_network"
+                }
+
+            # Fallback to Cosine Similarity
             from app.services.liveness_service import liveness_service
             similarity_result = liveness_service.calculate_face_similarity(
                 current_embedding,
@@ -99,7 +131,8 @@ class MLService:
                 "verified": similarity_result["verified"],
                 "confidence": similarity_result["confidence"],
                 "similarity": similarity_result["similarity"],
-                "distance": similarity_result["distance"]
+                "distance": similarity_result["distance"],
+                "method": "cosine_similarity"
             }
             
         except Exception as e:
@@ -144,23 +177,45 @@ class MLService:
                 "error": f"Face embedding failed: {str(e)}"
             }
         
-        # Step 3: Calculate similarity with stored embedding (cosine similarity)
-        similarity_result = liveness_service.calculate_face_similarity(
-            current_embedding, 
-            stored_embedding
-        )
+        # Step 3: Verification (Model or Cosine)
+        if self.verifier_model:
+             # Prepare input for model: Abs Diff
+            diff = np.abs(np.array(current_embedding) - np.array(stored_embedding))
+            diff = diff.reshape(1, 128)
+            
+            # Predict
+            prob = float(self.verifier_model.predict(diff, verbose=0)[0][0])
+            
+            # High threshold for custom model to prevent false positives
+            MODEL_THRESHOLD = 0.80
+            verified = prob > MODEL_THRESHOLD
+            
+            result = {
+                "verified": verified,
+                "confidence": prob,
+                "similarity": prob,
+                "distance": 0.0, # Not applicable for NN
+                "threshold": MODEL_THRESHOLD
+            }
+        else:
+            # Step 3: Calculate similarity with stored embedding (cosine similarity)
+            result = liveness_service.calculate_face_similarity(
+                current_embedding, 
+                stored_embedding
+            )
         
         # Step 4: Liveness check - if MediaPipe detected face mesh, it's likely real
         liveness_score = 0.95  # High score if face landmarks detected properly
         
         return {
-            "verified": similarity_result["verified"],
+            "verified": result["verified"],
             "face_detected": True,
-            "confidence": similarity_result["confidence"],
-            "similarity": similarity_result["similarity"],
-            "distance": similarity_result["distance"],
+            "confidence": result["confidence"],
+            "similarity": result["similarity"],
+            "distance": result.get("distance", 0.0),
             "liveness_score": liveness_score,
-            "threshold": similarity_result["threshold"]
+            "threshold": result.get("threshold", 0.5),
+            "method": "custom_neural_network" if self.verifier_model else "cosine_similarity"
         }
     
     def verify_face_multi(self, image_bytes: bytes, enrollment_embeddings: List[List[float]], averaged_embedding: List[float]) -> Dict:
@@ -173,6 +228,37 @@ class MLService:
             current_embedding = self.get_face_embedding(image_bytes)
             
             from app.services.liveness_service import liveness_service
+
+            # --- CUSTOM MODEL LOGIC ---
+            if self.verifier_model:
+                # Compare against averaged embedding
+                diff_avg = np.abs(np.array(current_embedding) - np.array(averaged_embedding))
+                diff_avg = diff_avg.reshape(1, 128)
+                avg_prob = float(self.verifier_model.predict(diff_avg, verbose=0)[0][0])
+                
+                # Compare against each individual enrollment embedding
+                match_count = 0
+                MODEL_THRESHOLD = 0.80
+                
+                for enroll_emb in enrollment_embeddings:
+                    diff = np.abs(np.array(current_embedding) - np.array(enroll_emb))
+                    diff = diff.reshape(1, 128)
+                    prob = float(self.verifier_model.predict(diff, verbose=0)[0][0])
+                    if prob > MODEL_THRESHOLD:
+                        match_count += 1
+                
+                # Verification passes if averaged matches AND majority of individuals match
+                verified = avg_prob > MODEL_THRESHOLD and match_count >= 3
+                
+                return {
+                    "verified": verified,
+                    "confidence": avg_prob,
+                    "similarity": avg_prob,
+                    "match_count": match_count,
+                    "total_samples": len(enrollment_embeddings),
+                    "method": "custom_neural_network"
+                }
+            # --- END CUSTOM MODEL LOGIC ---
             
             # Compare against averaged embedding
             avg_result = liveness_service.calculate_face_similarity(
@@ -201,7 +287,8 @@ class MLService:
                 "similarity": avg_result["similarity"],
                 "distance": avg_result["distance"],
                 "match_count": match_count,
-                "total_samples": len(enrollment_embeddings)
+                "total_samples": len(enrollment_embeddings),
+                "method": "cosine_similarity"
             }
             
         except Exception as e:

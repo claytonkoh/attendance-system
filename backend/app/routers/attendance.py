@@ -53,8 +53,19 @@ async def verify_face(
          )
 
     # Step 2: Face Verification with Liveness Integration
-    # Uses cosine similarity with LENIENT threshold from config
-    result = ml_service.verify_face_with_liveness(content, current_user.face_embedding)
+    # Check if we have multiple enrollment samples (more robust)
+    if current_user.enrollment_embeddings and len(current_user.enrollment_embeddings) == 5:
+        # Use multi-sample verification
+        result = ml_service.verify_face_multi(
+            content, 
+            current_user.enrollment_embeddings,
+            current_user.face_embedding
+        )
+        # Add liveness score (since verify_face_multi doesn't include it in return)
+        result["liveness_score"] = liveness_score
+    else:
+        # Fallback to single embedding verification
+        result = ml_service.verify_face_with_liveness(content, current_user.face_embedding)
     
     if not result["verified"]:
          # Get actual confidence and threshold used
@@ -63,7 +74,7 @@ async def verify_face(
          
          raise HTTPException(
              status_code=400, 
-             detail=f"Face verification failed. Confidence: {actual_confidence*100:.1f}% (Required: {threshold_used*100:.1f}%)"
+             detail=f"Face verification failed. Confidence: {actual_confidence*100:.1f}%"
          )
 
     # Step 3: Mark Attendance

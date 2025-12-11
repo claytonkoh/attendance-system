@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.mongodb import connect_to_mongo, close_mongo_connection
-from app.routers import auth, classes, attendance, admin, liveness
+from app.routers import auth, classes, attendance, admin, liveness, training
+
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -32,6 +33,7 @@ app.include_router(classes.router, prefix="/classes", tags=["classes"])
 app.include_router(attendance.router, prefix="/attendance", tags=["attendance"])
 app.include_router(admin.router, prefix="/admin", tags=["admin"])
 app.include_router(liveness.router, prefix="/liveness", tags=["liveness"])
+app.include_router(training.router, prefix="/training", tags=["training"])
 
 @app.get("/")
 async def root():

@@ -12,8 +12,9 @@ class FaceRecognitionConfig:
     ENFORCE_DETECTION = True
     
     # Thresholds (adjust these for accuracy)
-    CONFIDENCE_THRESHOLD = 0.40  # Lowered for better detection (was 0.80)
-    SIMILARITY_THRESHOLD = 0.40  # Increased for more lenient matching (was 0.20)
+    # Thresholds (adjust these for accuracy)
+    CONFIDENCE_THRESHOLD = 0.75  # Increased for stricter security (was 0.40)
+    SIMILARITY_THRESHOLD = 0.75  # Increased for stricter matching (was 0.40)
 
 
 # ===== ENROLLMENT =====
