@@ -18,7 +18,8 @@ RUN pip install --no-cache-dir --timeout=1000 \
     opencv-python-headless \
     scipy \
     pandas \
-    matplotlib
+    matplotlib \
+    scikit-learn
 
 # Install remaining Python dependencies
 COPY requirements.txt .
