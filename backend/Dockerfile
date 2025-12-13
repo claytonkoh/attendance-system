@@ -12,7 +12,7 @@ WORKDIR /app
 # libgl1-mesa-glx and libglib2.0-0 are often needed for cv2 even in headless mode for some internal deps
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
