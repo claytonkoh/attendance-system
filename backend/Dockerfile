@@ -21,6 +21,9 @@ RUN pip install --no-cache-dir --timeout=1000 tensorflow-cpu==2.15.0
 RUN pip install --no-cache-dir --timeout=1000 deepface==0.0.79
 RUN pip install --no-cache-dir --timeout=1000 mediapipe opencv-python-headless
 
+# Install scipy and other medium deps to checkpoint progress
+RUN pip install --no-cache-dir --timeout=1000 scipy pandas matplotlib
+
 # Install remaining Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir --timeout=1000 -r requirements.txt
