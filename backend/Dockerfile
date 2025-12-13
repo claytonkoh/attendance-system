@@ -16,9 +16,14 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Install heavy dependencies first for better caching and to avoid timeouts
+RUN pip install --no-cache-dir --timeout=1000 tensorflow-cpu==2.15.0
+RUN pip install --no-cache-dir --timeout=1000 deepface==0.0.79
+RUN pip install --no-cache-dir --timeout=1000 mediapipe opencv-python-headless
+
+# Install remaining Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --timeout=1000 -r requirements.txt
 
 # Copy project
 COPY . .
