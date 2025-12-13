@@ -68,13 +68,17 @@ async def verify_face(
         result = ml_service.verify_face_with_liveness(content, current_user.face_embedding)
     
     if not result["verified"]:
-         # Get actual confidence and threshold used
          actual_confidence = result.get("confidence", 0.0)
          threshold_used = result.get("threshold", CONFIDENCE_THRESHOLD)
          
+         detail_msg = f"Face verification failed. Confidence: {actual_confidence*100:.1f}% (Required: {threshold_used*100:.1f}%)"
+         
+         if result.get("match_count") is not None:
+             detail_msg += f". Matched {result.get('match_count')}/{result.get('total_samples', 5)} samples."
+             
          raise HTTPException(
              status_code=400, 
-             detail=f"Face verification failed. Confidence: {actual_confidence*100:.1f}%"
+             detail=detail_msg
          )
 
     # Step 3: Mark Attendance

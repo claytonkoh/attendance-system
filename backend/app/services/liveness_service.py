@@ -5,20 +5,17 @@ SIMPLIFIED - Instant detection (no frame counting required)
 import cv2
 import numpy as np
 import mediapipe as mp
-from app.core.liveness_config import (
-    BLINK_THRESH, TURN_THRESH,
-    CONFIDENCE_THRESHOLD, MEDIAPIPE_CONFIG
-)
+import app.core.liveness_config as liveness_config
 
 class LivenessDetectionService:
     def __init__(self):
         # MediaPipe Face Mesh setup
         self.mp_face_mesh = mp.solutions.face_mesh
         self.face_mesh = self.mp_face_mesh.FaceMesh(
-            max_num_faces=MEDIAPIPE_CONFIG["max_num_faces"],
-            refine_landmarks=MEDIAPIPE_CONFIG["refine_landmarks"],
-            min_detection_confidence=MEDIAPIPE_CONFIG["min_detection_confidence"],
-            min_tracking_confidence=MEDIAPIPE_CONFIG["min_tracking_confidence"]
+            max_num_faces=liveness_config.MEDIAPIPE_CONFIG["max_num_faces"],
+            refine_landmarks=liveness_config.MEDIAPIPE_CONFIG["refine_landmarks"],
+            min_detection_confidence=liveness_config.MEDIAPIPE_CONFIG["min_detection_confidence"],
+            min_tracking_confidence=liveness_config.MEDIAPIPE_CONFIG["min_tracking_confidence"]
         )
         
         # 3D face model for head pose
@@ -118,7 +115,7 @@ class LivenessDetectionService:
         if challenge == "LOOK LEFT":
             # Must turn LEFT significantly (yaw < -thresh)
             # AND maintain upright head position (roll/pitch small) to prevent photo rotation attacks
-            is_turning = yaw < -TURN_THRESH
+            is_turning = yaw < -liveness_config.TURN_THRESH
             
             # NORMALIZATION: Handle cases where pitch/roll is near 180 (inverted/flipped coordinates)
             # Accept if angle is within tolerance of 0 OR within tolerance of 180/-180
@@ -128,11 +125,11 @@ class LivenessDetectionService:
             is_upright = valid_pitch and valid_roll
             passed = bool(is_turning and is_upright)
             
-            print(f"LOOK LEFT: yaw={yaw:.2f} (<-{TURN_THRESH}?), roll={roll:.2f}, pitch={pitch:.2f}, passed={passed}")
+            print(f"LOOK LEFT: yaw={yaw:.2f} (<-{liveness_config.TURN_THRESH}?), roll={roll:.2f}, pitch={pitch:.2f}, passed={passed}")
         
         elif challenge == "LOOK RIGHT":
             # Must turn RIGHT significantly (yaw > thresh)
-            is_turning = yaw > TURN_THRESH
+            is_turning = yaw > liveness_config.TURN_THRESH
             
             valid_pitch = abs(pitch) < 45 or abs(abs(pitch) - 180) < 45
             valid_roll = abs(roll) < 40 or abs(abs(roll) - 180) < 40
@@ -140,11 +137,11 @@ class LivenessDetectionService:
             is_upright = valid_pitch and valid_roll
             passed = bool(is_turning and is_upright)
             
-            print(f"LOOK RIGHT: yaw={yaw:.2f} (>{TURN_THRESH}?), roll={roll:.2f}, pitch={pitch:.2f}, passed={passed}")
+            print(f"LOOK RIGHT: yaw={yaw:.2f} (>{liveness_config.TURN_THRESH}?), roll={roll:.2f}, pitch={pitch:.2f}, passed={passed}")
         
         elif challenge == "BLINK":
-            passed = bool(avg_ear < BLINK_THRESH)  # Are eyes closed NOW?
-            print(f"BLINK: EAR={avg_ear:.3f}, threshold={BLINK_THRESH}, passed={passed}")
+            passed = bool(avg_ear < liveness_config.BLINK_THRESH)  # Are eyes closed NOW?
+            print(f"BLINK: EAR={avg_ear:.3f}, threshold={liveness_config.BLINK_THRESH}, passed={passed}")
         
         return {
             "challenge_passed": passed,
@@ -154,7 +151,7 @@ class LivenessDetectionService:
                 "yaw": float(yaw),
                 "roll": float(roll),
                 "ear": float(avg_ear),
-                "is_blinking": bool(avg_ear < BLINK_THRESH)
+                "is_blinking": bool(avg_ear < liveness_config.BLINK_THRESH)
             }
         }
     
@@ -166,14 +163,19 @@ class LivenessDetectionService:
         similarity = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
         dist = 1 - similarity
         confidence = similarity
-        verified = bool(confidence >= CONFIDENCE_THRESHOLD)
+        
+        # Access config dynamically
+        threshold = liveness_config.CONFIDENCE_THRESHOLD
+        verified = bool(confidence >= threshold)
+        
+        print(f"DEBUG: Similarity={confidence:.4f}, Threshold={threshold}, Verified={verified}")
         
         return {
             "verified": verified,
             "confidence": float(confidence),
             "similarity": float(similarity),
             "distance": float(dist),
-            "threshold": CONFIDENCE_THRESHOLD
+            "threshold": threshold
         }
 
 # Global instance
