@@ -1,0 +1,14 @@
+venv
+backend/venv
+**/venv
+.venv
+__pycache__
+*.pyc
+.env
+.git
+.pytest_cache
+registration_error.log
+backend/uploads/
+node_modules
+admin/node_modules
+frontend/node_modules

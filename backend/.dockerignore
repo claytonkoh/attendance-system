@@ -5,3 +5,6 @@ __pycache__
 .git
 .pytest_cache
 registration_error.log
+uploads/
+**/venv
+.venv
