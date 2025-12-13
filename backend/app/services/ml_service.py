@@ -1,5 +1,6 @@
 import requests
 from app.core.config import settings
+from app.core.liveness_config import CONFIDENCE_THRESHOLD
 from typing import List, Dict
 import numpy as np
 import cv2
@@ -187,7 +188,7 @@ class MLService:
             prob = float(self.verifier_model.predict(diff, verbose=0)[0][0])
             
             # High threshold for custom model to prevent false positives
-            MODEL_THRESHOLD = 0.80
+            MODEL_THRESHOLD = CONFIDENCE_THRESHOLD
             verified = prob > MODEL_THRESHOLD
             
             result = {
@@ -238,7 +239,7 @@ class MLService:
                 
                 # Compare against each individual enrollment embedding
                 match_count = 0
-                MODEL_THRESHOLD = 0.80
+                MODEL_THRESHOLD = CONFIDENCE_THRESHOLD
                 
                 for enroll_emb in enrollment_embeddings:
                     diff = np.abs(np.array(current_embedding) - np.array(enroll_emb))

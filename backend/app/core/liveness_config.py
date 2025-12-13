@@ -8,7 +8,7 @@ import numpy as np
 SIMILARITY_THRESHOLD = 0.40  # Match notebook (previously 0.20 in notebook but 0.40 in code?) 
 # Notebook says: "SIMILARITY_THRESHOLD = 0.20" in ONE cell, but "confidence >= 0.80" later.
 # We will trust the "Confidence >= 0.80" logic. 
-CONFIDENCE_THRESHOLD = 0.80  # Strictest matching
+CONFIDENCE_THRESHOLD = 0.75  # Changed from 0.80 to 0.75 per user request
 
 # ===== LIVENESS DETECTION PARAMETERS =====
 # STRICTER settings to prevent spoofing

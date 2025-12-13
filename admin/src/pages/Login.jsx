@@ -45,7 +45,6 @@ export default function Login() {
           navigate("/dashboard");
         })
         .catch(() => {
-          // Token is invalid, let user login
           localStorage.removeItem("token");
         });
     }
@@ -58,7 +57,7 @@ export default function Login() {
     try {
       // Use URLSearchParams for OAuth2PasswordRequestForm compatibility
       const formData = new URLSearchParams();
-      formData.append("username", email); // FastAPI OAuth2 uses 'username'
+      formData.append("username", email); 
       formData.append("password", password);
 
       const response = await api.post("/auth/login", formData, {

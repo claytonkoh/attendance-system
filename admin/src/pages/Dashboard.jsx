@@ -32,7 +32,7 @@ export default function AdminDashboard() {
 
       // Fetch recent attendance
       const attendanceRes = await api.get('/admin/attendance')
-      setRecentAttendance(attendanceRes.data.slice(0, 5)) // Get last 5 records
+      setRecentAttendance(attendanceRes.data.slice(0, 5)) 
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
       toast.error('Failed to load dashboard data')

@@ -359,7 +359,7 @@ export default function Signup() {
                         audio={false}
                         ref={webcamRef}
                         screenshotFormat="image/jpeg"
-                        className="rounded-lg w-full max-h-60 object-fill"
+                        className="rounded-lg w-full max-h-60 object-cover"
                         videoConstraints={{ facingMode: "user" }}
                       />
 
@@ -417,7 +417,7 @@ export default function Signup() {
                       <img
                         src={img}
                         alt={`Sample ${index + 1}`}
-                        className="w-full h-20 object-fill rounded border-2 border-primary"
+                        className="w-full h-20 object-cover rounded border-2 border-primary"
                       />
                       <div className="absolute top-0 right-0 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                         {index + 1}

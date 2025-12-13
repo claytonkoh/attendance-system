@@ -8,12 +8,20 @@ from app.routers import auth, classes, attendance, admin, liveness, training
 app = FastAPI(title=settings.PROJECT_NAME)
 
 # CORS
+import os
+
+# CORS
 origins = [
     "http://localhost",
     "http://localhost:3000", # React/Next.js default
     "http://localhost:5173", # Vite default
     "http://localhost:5174", # Admin Dashboard
 ]
+
+# Add allowed origins from environment variable
+env_origins = os.getenv("ALLOWED_ORIGINS")
+if env_origins:
+    origins.extend(origin.strip() for origin in env_origins.split(","))
 
 app.add_middleware(
     CORSMiddleware,
