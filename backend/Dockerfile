@@ -21,6 +21,9 @@ RUN pip install --no-cache-dir --timeout=1000 -r requirements.txt
 # This fixes the "GetMessageClass" error if any other package tried to upgrade it
 RUN pip install --force-reinstall --no-cache-dir protobuf==3.20.3
 
+# Verify TensorFlow installation (debugging step - remove after confirming it works)
+RUN python -c "import tensorflow as tf; print(f'TensorFlow version: {tf.__version__}'); from tensorflow import keras; print('Keras import successful')"
+
 # Copy the rest of the project
 COPY . .
 
