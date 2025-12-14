@@ -12,7 +12,9 @@ async def get_database():
 async def connect_to_mongo():
     try:
         print(f"Connecting to MongoDB at: {settings.MONGODB_URL.split('@')[-1] if '@' in settings.MONGODB_URL else settings.MONGODB_URL}")
-        db.client = AsyncIOMotorClient(settings.MONGODB_URL)
+        # Strip whitespace/newlines which are common copy-paste errors
+        mongo_url = settings.MONGODB_URL.strip()
+        db.client = AsyncIOMotorClient(mongo_url)
         
         # Verify the connection by pinging the database
         await db.client.admin.command('ping')
