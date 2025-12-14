@@ -25,6 +25,10 @@ RUN pip install --no-cache-dir --timeout=1000 \
 COPY requirements.txt .
 RUN pip install --no-cache-dir --timeout=1000 -r requirements.txt
 
+# FORCE REINSTALL PROTOBUF TO FIX MEDIAPIPE CRASH
+# This must be the very last pip install to ensure it overrides everything else
+RUN pip install --force-reinstall --no-cache-dir protobuf==3.20.3
+
 # Copy project
 COPY . .
 
