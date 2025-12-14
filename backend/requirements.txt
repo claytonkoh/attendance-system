@@ -10,5 +10,19 @@ python-jose[cryptography]==3.3.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 email-validator==2.1.0
-protobuf==3.20.3
 scikit-learn==1.3.2
+
+# AI Core (CPU optimized)
+tensorflow-cpu==2.15.0
+keras==2.15.0
+
+# The Critical Fix
+protobuf==3.20.3
+
+# Vision Libraries
+deepface
+mediapipe==0.10.9
+opencv-python-headless
+pandas
+matplotlib
+scipy
