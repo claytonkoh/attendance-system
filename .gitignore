@@ -45,3 +45,8 @@ backend/venv/
 *.njsproj
 *.sln
 *.sw?
+
+SIGNUP_BACKEND_FLOW.md 
+ADMIN_RAILWAY_SETUP.md
+ADMIN_CREDENTIALS.md
+DEPLOYMENT_GUIDE.md 
