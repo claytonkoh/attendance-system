@@ -85,7 +85,7 @@ async def verify_face(
     attendance_record = {
         "class_id": class_id,
         "student_id": str(current_user.id),
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(),
         "status": "present",
         "verification_method": "face_recognition_with_liveness",
         "confidence_score": result["confidence"],

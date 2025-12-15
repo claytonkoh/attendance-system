@@ -29,14 +29,20 @@ async def get_dashboard_stats(
     
     # Get today's attendance
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start_str = today_start.strftime("%Y-%m-%d %H:%M:%S.%f")
+    today_start_dtime = datetime.strptime(today_start_str, "%Y-%m-%d %H:%M:%S.%f")
+    
     today_attendance = await db["attendance"].count_documents({
-        "timestamp": {"$gte": today_start.isoformat()}
+        "timestamp": {"$gte": today_start_dtime}
     })
     
     # Get recent attendance (last 7 days)
     week_ago = datetime.now() - timedelta(days=7)
+    week_ago_str = week_ago.strftime("%Y-%m-%d %H:%M:%S.%f")
+    week_ago_dtime = datetime.strptime(week_ago_str, "%Y-%m-%d %H:%M:%S.%f")
+    
     recent_attendance = await db["attendance"].count_documents({
-        "timestamp": {"$gte": week_ago.isoformat()}
+        "timestamp": {"$gte": week_ago_dtime}
     })
     
     return {

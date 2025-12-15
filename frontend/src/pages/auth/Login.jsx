@@ -69,11 +69,17 @@ export default function Login() {
 
       // Redirect based on user role
       if (user?.role === "admin") {
-        // Clear token from current frontend before redirecting to admin dashboard
+        const isProd = import.meta.env.PROD;
+        const deployedAdminUrl = import.meta.env.VITE_ADMIN_DASHBOARD_URL;
+        console.log(deployedAdminUrl);
         localStorage.removeItem("token");
-        // Redirect to admin panel with token as query param
-        window.location.href = `${ADMIN_DASHBOARD_URL}/dashboard?token=${token}`;
-        return; // Prevent further execution
+        if (isProd && deployedAdminUrl) {
+          window.location.href = `${deployedAdminUrl}?token=${token}`;
+        } else {
+          // Fallback to local admin dashboard for dev
+          window.location.href = `attendance-system-admin.vercel.app/dashboard?token=${token}`;
+        }
+        return;
       } else if (user?.role === "lecturer") {
         // Redirect to lecturer dashboard
         navigate("/");
