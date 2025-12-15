@@ -33,6 +33,8 @@ backend/venv/
 .env
 .env.*
 *.env
+!frontend/.env.local
+!frontend/.env.production
 
 ###############################
 # Editors / OS
