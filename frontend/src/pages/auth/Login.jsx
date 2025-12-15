@@ -78,7 +78,7 @@ export default function Login() {
           window.location.href = `${deployedAdminUrl}?token=${token}`;
         } else {
           // Fallback to local admin dashboard for dev
-          window.location.href = `http://localhost:5174/dashboard?token=${token}`;
+          window.location.href = `attendance-system-admin.vercel.app/dashboard?token=${token}`;
         }
         return;
       } else if (user?.role === "lecturer") {
