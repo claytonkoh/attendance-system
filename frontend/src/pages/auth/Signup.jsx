@@ -141,8 +141,8 @@ export default function Signup() {
         formData.append("files", file);
       });
 
-      // Call API directly instead of using registerAuth
-      const response = await fetch("http://localhost:8000/auth/register", {
+      // Call API using configured baseURL
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://attendance-system-production-4c65.up.railway.app'}/auth/register`, {
         method: "POST",
         body: formData,
       });
