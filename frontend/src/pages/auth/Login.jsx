@@ -44,6 +44,9 @@ const itemVariants = {
   },
 };
 
+// ⚙️ CONFIGURATION: Set your admin dashboard URL here
+const ADMIN_DASHBOARD_URL = 'http://attendance-system-admin.vercel.app'; // Change this to your deployed URL
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -67,10 +70,10 @@ export default function Login() {
 
       // Redirect based on user role
       if (user?.role === "admin") {
-        // Clear token from localhost:5173 before redirecting to localhost:5174
+        // Clear token from current frontend before redirecting to admin dashboard
         localStorage.removeItem("token");
-        // Redirect to admin panel at localhost:5174 with token as query param
-        window.location.href = `http://localhost:5174/dashboard?token=${token}`;
+        // Redirect to admin panel with token as query param
+        window.location.href = `${ADMIN_DASHBOARD_URL}/dashboard?token=${token}`;
         return; // Prevent further execution
       } else if (user?.role === "lecturer") {
         // Redirect to lecturer dashboard
