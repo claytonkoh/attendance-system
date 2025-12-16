@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// ⚙️ CONFIGURATION: Set your backend URL here
+const BACKEND_URL = 'https://attendance-system-production-4c65.up.railway.app'; // Change this to your Railway URL
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_URL || BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },

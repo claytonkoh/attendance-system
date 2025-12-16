@@ -44,9 +44,6 @@ const itemVariants = {
   },
 };
 
-// ⚙️ CONFIGURATION: Set your admin dashboard URL here
-const ADMIN_DASHBOARD_URL = "http://attendance-system-admin.vercel.app"; // Change this to your deployed URL
-
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
