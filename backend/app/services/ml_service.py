@@ -47,7 +47,7 @@ class MLService:
                 img_path=frame,
                 model_name="Facenet",
                 enforce_detection=True,  # Ensure face is detected
-                detector_backend="opencv"
+                detector_backend="mediapipe"
             )
             
             if not results or len(results) == 0:
