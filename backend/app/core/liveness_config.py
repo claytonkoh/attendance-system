@@ -3,42 +3,29 @@ Liveness Detection Configuration
 TUNED FOR REALISTIC HUMAN BEHAVIOR (normal blink, 3 second turn)
 """
 import numpy as np
+SIMILARITY_THRESHOLD = 0.40
+CONFIDENCE_THRESHOLD = 0.75  
+BLINK_THRESH = 0.18  
+TURN_THRESH = 20     
 
-# ===== FACE VERIFICATION CONFIGURATION =====
-SIMILARITY_THRESHOLD = 0.40  # Match notebook (previously 0.20 in notebook but 0.40 in code?) 
-# Notebook says: "SIMILARITY_THRESHOLD = 0.20" in ONE cell, but "confidence >= 0.80" later.
-# We will trust the "Confidence >= 0.80" logic. 
-CONFIDENCE_THRESHOLD = 0.75  # Changed from 0.80 to 0.75 per user request
+HOLD_FRAMES = 15          
+BLINK_MIN_FRAMES = 3      
 
-# ===== LIVENESS DETECTION PARAMETERS =====
-# STRICTER settings to prevent spoofing
-BLINK_THRESH = 0.18  # Very strict - eyes must be fully closed
-TURN_THRESH = 20     # Strict - explicit 20 degree head turn required
+CHALLENGE_TIMEOUT = 10.0
 
-# CRITICAL: Frame counts for timing
-# These map to frontend checks (approx 100ms per check)
-HOLD_FRAMES = 15          # 1.5 seconds hold required (prevents quick photo flashes)
-BLINK_MIN_FRAMES = 3      # 300ms blink duration
-
-
-CHALLENGE_TIMEOUT = 10.0  # Increased for more time
-
-# ===== CHALLENGE CONFIGURATION =====
 CHALLENGES = ["LOOK LEFT", "LOOK RIGHT", "BLINK"]
 REQUIRED_PASSES = 3
 VERIFICATION_DELAY = 2.0
 
 # ===== MEDIAPIPE CONFIGURATION =====
-# Lenient detection settings
 MEDIAPIPE_CONFIG = {
     "max_num_faces": 1,
     "refine_landmarks": True,
-    "min_detection_confidence": 0.3,  # Lowered for easier detection
-    "min_tracking_confidence": 0.3    # Lowered for easier detection
+    "min_detection_confidence": 0.3, 
+    "min_tracking_confidence": 0.3    
 }
 
 # ===== 3D FACE MODEL FOR HEAD POSE ESTIMATION =====
-# These are standardized 3D coordinates for key facial landmarks
 FACE_3D_MODEL = np.array([
     [0.0, 0.0, 0.0],            # Nose tip
     [0.0, -330.0, -65.0],       # Chin
@@ -49,7 +36,6 @@ FACE_3D_MODEL = np.array([
 ], dtype=np.float64)
 
 # ===== MEDIAPIPE LANDMARK INDICES =====
-# Indices for facial landmarks used in calculations
 FACE_2D_IDX = [1, 152, 33, 263, 61, 291]  # Landmarks for head pose estimation
 
 # Eye landmark indices for EAR calculation

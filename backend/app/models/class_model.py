@@ -6,15 +6,15 @@ from bson import ObjectId
 class ClassBase(BaseModel):
     name: str
     code: str
-    lecturer_id: str # User ID of the lecturer
-    schedule: str # e.g., "Mon 10:00-12:00"
+    lecturer_id: str 
+    schedule: str 
 
 class ClassCreate(ClassBase):
     pass
 
 class ClassInDB(ClassBase):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    enrolled_student_ids: List[str] = [] # List of User IDs
+    enrolled_student_ids: List[str] = [] 
 
     model_config = ConfigDict(
         populate_by_name=True,

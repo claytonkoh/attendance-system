@@ -1,7 +1,3 @@
-"""
-Liveness Detection Service
-SIMPLIFIED - Instant detection (no frame counting required)
-"""
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -89,10 +85,6 @@ class LivenessDetectionService:
             return None
     
     def verify_liveness_frame(self, image_bytes: bytes, challenge: str):
-        """
-        Verify liveness frame - INSTANT detection
-        Just checks if the condition is met in THIS single frame
-        """
         detection = self.detect_face_landmarks(image_bytes)
         if not detection:
             return {
@@ -113,12 +105,8 @@ class LivenessDetectionService:
         passed = False
         
         if challenge == "LOOK LEFT":
-            # Must turn LEFT significantly (yaw < -thresh)
-            # AND maintain upright head position (roll/pitch small) to prevent photo rotation attacks
             is_turning = yaw < -liveness_config.TURN_THRESH
             
-            # NORMALIZATION: Handle cases where pitch/roll is near 180 (inverted/flipped coordinates)
-            # Accept if angle is within tolerance of 0 OR within tolerance of 180/-180
             valid_pitch = abs(pitch) < 45 or abs(abs(pitch) - 180) < 45
             valid_roll = abs(roll) < 40 or abs(abs(roll) - 180) < 40
             

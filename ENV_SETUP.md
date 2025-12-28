@@ -35,7 +35,7 @@ ML_SERVICE_URL=http://localhost:8001
 
 ---
 
-## 🌐 Frontend (Vercel)
+## Frontend (Vercel)
 
 ### File yang Sudah Ada
 
@@ -65,7 +65,7 @@ VITE_API_URL=https://your-backend.railway.app
 
 ---
 
-## 🔐 Admin Dashboard (Vercel)
+## Admin Dashboard (Vercel)
 
 ### File yang Sudah Ada
 
@@ -92,7 +92,7 @@ VITE_API_URL=https://your-backend.railway.app
 
 ---
 
-## ⚙️ Cara Update URL Backend Railway
+## Cara Update URL Backend Railway
 
 1. Buka Railway dashboard → Backend service
 2. Copy deployment URL (contoh: `https://attendance-backend-production.up.railway.app`)
@@ -111,7 +111,7 @@ VITE_API_URL=https://your-backend.railway.app
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Local Development
 
@@ -139,7 +139,7 @@ npm run dev
 
 ---
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Issue: 404 NOT_FOUND di admin dashboard
 
@@ -159,7 +159,7 @@ npm run dev
 
 ---
 
-## 📝 Checklist Deploy
+## Checklist Deploy
 
 - [ ] Backend deployed di Railway dengan env vars
 - [ ] Copy backend Railway URL
