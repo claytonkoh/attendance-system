@@ -1,5 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import settings
+import certifi
 
 class Database:
     client: AsyncIOMotorClient = None
@@ -14,7 +15,10 @@ async def connect_to_mongo():
         print(f"Connecting to MongoDB at: {settings.MONGODB_URL.split('@')[-1] if '@' in settings.MONGODB_URL else settings.MONGODB_URL}")
         # Strip whitespace/newlines which are common copy-paste errors
         mongo_url = settings.MONGODB_URL.strip()
-        db.client = AsyncIOMotorClient(mongo_url)
+        db.client = AsyncIOMotorClient(
+            mongo_url,
+            tlsCAFile=certifi.where()
+        )
         
         # Verify the connection by pinging the database
         await db.client.admin.command('ping')
