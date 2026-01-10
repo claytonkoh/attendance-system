@@ -142,7 +142,7 @@ export default function Signup() {
       });
 
       // Call API using configured baseURL
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://attendance-system-production-4c65.up.railway.app'}/auth/register`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://spitblaze-backend-attendance-system.hf.space'}/auth/register`, {
         method: "POST",
         body: formData,
       });
