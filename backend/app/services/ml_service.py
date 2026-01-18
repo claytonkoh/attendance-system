@@ -20,20 +20,13 @@ class MLService:
             model_path = os.path.join(os.getcwd(), "app", "ml_models", "face_verifier.keras")
             if os.path.exists(model_path):
                 self.verifier_model = tf.keras.models.load_model(model_path)
-                print(f"✨ Loaded custom fine-tuned verification model from {model_path}")
+                print(f"Loaded custom fine-tuned verification model from {model_path}")
             else:
-                print("⚠️  No custom fine-tuned model found. Using standard cosine similarity.")
+                print("No custom fine-tuned model found. Using standard cosine similarity.")
         except Exception as e:
-            print(f"⚠️  Failed to load custom model: {e}. Using standard cosine similarity.")
+            print(f"Failed to load custom model: {e}. Using standard cosine similarity.")
             
     def get_face_embedding(self, image_bytes: bytes) -> List[float]:
-        """
-        Generate face embedding using DeepFace with Facenet model.
-        This is the REAL implementation matching siamese.ipynb
-        
-        Returns:
-            List of 128 floats representing the face embedding
-        """
         try:
             # Convert bytes to numpy array
             nparr = np.frombuffer(image_bytes, np.uint8)
@@ -63,14 +56,6 @@ class MLService:
             raise ValueError(f"Face embedding generation failed: {str(e)}")
 
     def process_enrollment_samples(self, image_bytes_list: List[bytes]) -> Dict:
-        """
-        Process multiple enrollment samples (should be exactly 5).
-        Returns both individual embeddings and the averaged embedding.
-        
-        This mimics the enrollment logic from siamese.ipynb:
-        1. Get embedding for each of the 5 samples using DeepFace
-        2. Average them to get the final enrollment embedding
-        """
         if len(image_bytes_list) != self.REQUIRED_SAMPLES:
             raise ValueError(f"Expected {self.REQUIRED_SAMPLES} samples, got {len(image_bytes_list)}")
         
@@ -80,7 +65,7 @@ class MLService:
             try:
                 embedding = self.get_face_embedding(image_bytes)
                 embeddings.append(embedding)
-                print(f"✅ Sample {i+1}/{self.REQUIRED_SAMPLES}: Embedding generated (dim: {len(embedding)})")
+                print(f"Sample {i+1}/{self.REQUIRED_SAMPLES}: Embedding generated (dim: {len(embedding)})")
             except Exception as e:
                 raise ValueError(f"Failed to process sample {i+1}: {str(e)}")
         
@@ -145,13 +130,6 @@ class MLService:
             }
     
     def verify_face_with_liveness(self, image_bytes: bytes, stored_embedding: List[float]) -> Dict:
-        """
-        Advanced verification using liveness detection and face matching.
-        This integrates the liveness service for more robust verification.
-        
-        Returns:
-            Dict with verification results including liveness metrics
-        """
         from app.services.liveness_service import liveness_service
         
         # Step 1: Check for face detection and get landmarks (MediaPipe liveness)
@@ -220,10 +198,7 @@ class MLService:
         }
     
     def verify_face_multi(self, image_bytes: bytes, enrollment_embeddings: List[List[float]], averaged_embedding: List[float]) -> Dict:
-        """
-        More robust verification using both individual enrollment embeddings and averaged embedding.
-        Uses REAL DeepFace embeddings and compares against all 5 enrollment samples.
-        """
+
         try:
             # Get current face embedding
             current_embedding = self.get_face_embedding(image_bytes)
@@ -320,17 +295,6 @@ class MLService:
         return 0.95
     
     def verify_liveness_challenge(self, image_bytes: bytes, challenge: str) -> Dict:
-        """
-        Verify a specific liveness challenge (BLINK, LOOK LEFT, LOOK RIGHT).
-        Uses REAL MediaPipe detection - not mock!
-        
-        Args:
-            image_bytes: Image to verify
-            challenge: Challenge type ("BLINK", "LOOK LEFT", "LOOK RIGHT")
-        
-        Returns:
-            Dict with challenge verification results
-        """
         from app.services.liveness_service import liveness_service
         
         return liveness_service.verify_liveness_frame(image_bytes, challenge)

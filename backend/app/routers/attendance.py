@@ -10,10 +10,6 @@ from app.core.liveness_config import CONFIDENCE_THRESHOLD, SIMILARITY_THRESHOLD
 
 router = APIRouter()
 
-# ❌ REMOVED: OCR-based ID verification
-# We only use face matching for attendance verification
-
-
 @router.post("/verify-face")
 async def verify_face(
     class_id: str = Form(...),
@@ -21,16 +17,7 @@ async def verify_face(
     current_user: UserInDB = Depends(get_current_user),
     db = Depends(get_database)
 ):
-    """
-    Complete attendance verification using face recognition WITH liveness detection.
-    Now uses lenient thresholds from config for better reliability!
-    
-    Process:
-    1. Check class enrollment
-    2. Liveness detection using MediaPipe (anti-spoofing)
-    3. Face verification with confidence scoring (cosine similarity)
-    4. Mark attendance if all checks pass
-    """
+
     # Check enrollment
     class_obj = await db["classes"].find_one({"_id": ObjectId(class_id)})
     if not class_obj:
@@ -41,10 +28,9 @@ async def verify_face(
 
     content = await file.read()
     
-    # Step 1: Liveness Check with MediaPipe Face Mesh
-    # Using LENIENT threshold from config (0.70 instead of 0.80)
+
     liveness_score = ml_service.check_liveness(content)
-    LIVENESS_THRESHOLD = 0.70  # Lowered from 0.80 for better detection
+    LIVENESS_THRESHOLD = 0.70  
     
     if liveness_score < LIVENESS_THRESHOLD:
          raise HTTPException(
@@ -53,7 +39,6 @@ async def verify_face(
          )
 
     # Step 2: Face Verification with Liveness Integration
-    # Check if we have multiple enrollment samples (more robust)
     if current_user.enrollment_embeddings and len(current_user.enrollment_embeddings) == 5:
         # Use multi-sample verification
         result = ml_service.verify_face_multi(
@@ -61,10 +46,10 @@ async def verify_face(
             current_user.enrollment_embeddings,
             current_user.face_embedding
         )
-        # Add liveness score (since verify_face_multi doesn't include it in return)
+        # Add liveness score 
         result["liveness_score"] = liveness_score
     else:
-        # Fallback to single embedding verification
+        # Fallback
         result = ml_service.verify_face_with_liveness(content, current_user.face_embedding)
     
     if not result["verified"]:
@@ -92,7 +77,7 @@ async def verify_face(
         "liveness_score": result["liveness_score"],
         "similarity": result.get("similarity", 0.0),
         "distance": result.get("distance", 0.0),
-        "snapshot_url": "path/to/snapshot"  # Save file and put path here
+        "snapshot_url": "path/to/snapshot" 
     }
     
     await db["attendance"].insert_one(attendance_record)

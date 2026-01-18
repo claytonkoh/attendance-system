@@ -80,12 +80,6 @@ class TrainingService:
         return np.array(X_list), np.array(y_list)
 
     def generate_synthetic_data(self, n_samples=1000) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Generates synthetic embeddings for demonstration if database is empty.
-        Simulates 2 clusters of 'distances': 
-        - Small distances (positives)
-        - Large distances (negatives)
-        """
         # Positives: Small differences (close to 0) + noise
         X_pos = np.abs(np.random.normal(0, 0.1, (n_samples // 2, 128)))
         y_pos = np.ones(n_samples // 2)
@@ -103,15 +97,12 @@ class TrainingService:
         return X[indices], y[indices]
 
     def build_classifier_model(self):
-        """
-        Builds a lightweight neural network for binary classification of face similarity.
-        """
         model = tf.keras.Sequential([
-            tf.keras.layers.Input(shape=(128,)),             # Input: Difference vector (128 floats)
-            tf.keras.layers.Dense(64, activation='relu'),    # Hidden layer
-            tf.keras.layers.Dropout(0.3),                    # Regularization
-            tf.keras.layers.Dense(32, activation='relu'),    # Hidden layer 2
-            tf.keras.layers.Dense(1, activation='sigmoid')   # Output: Probability (0-1)
+            tf.keras.layers.Input(shape=(128,)),             
+            tf.keras.layers.Dense(64, activation='relu'),    
+            tf.keras.layers.Dropout(0.3),                    
+            tf.keras.layers.Dense(32, activation='relu'),    
+            tf.keras.layers.Dense(1, activation='sigmoid')   
         ])
         
         model.compile(
@@ -122,9 +113,6 @@ class TrainingService:
         return model
 
     async def train_and_evaluate(self):
-        """
-        Main pipeline: Fetch Data -> Split -> Train -> Evaluate -> Return Report
-        """
         # 1. Data Prep
         X, y = await self.fetch_training_data()
         

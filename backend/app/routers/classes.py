@@ -28,10 +28,6 @@ async def enroll_class(class_id: str, current_user: UserInDB = Depends(get_curre
     class_obj = await db["classes"].find_one({"_id": ObjectId(class_id)})
     if not class_obj:
         raise HTTPException(status_code=404, detail="Class not found")
-    
-    # Logic to verify if student belongs to class (e.g. check against a pre-approved list)
-    # For now, we assume open enrollment or that the check happens here
-    
     if current_user.id in class_obj.get("enrolled_student_ids", []):
          raise HTTPException(status_code=400, detail="Already enrolled")
 

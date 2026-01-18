@@ -18,18 +18,9 @@ async def register(
     password: str = Form(...),
     student_id: str = Form(...),
     major: str = Form(...),
-    files: List[UploadFile] = File(...),  # Changed to accept multiple files (5 samples)
+    files: List[UploadFile] = File(...),  
     db = Depends(get_database)
 ):
-    """
-    Register a new user with 5-sample enrollment (matching siamese.ipynb logic)
-    
-    Process:
-    1. Capture 5 face samples from the user
-    2. Generate embedding for each sample using DeepFace/Facenet
-    3. Average the 5 embeddings to create the final enrollment embedding
-    4. Store both individual embeddings and averaged embedding
-    """
     try:
         print(f"Registering user: {email}")
         
@@ -84,7 +75,7 @@ async def register(
         print(f"User inserted with ID: {new_user.inserted_id}")
         
         created_user = await db["users"].find_one({"_id": new_user.inserted_id})
-        print(f"✅ Student {student_id} successfully enrolled with 5 samples")
+        print(f"Student {student_id} successfully enrolled with 5 samples")
         
         # Return simplified response
         return {

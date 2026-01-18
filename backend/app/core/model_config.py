@@ -12,9 +12,8 @@ class FaceRecognitionConfig:
     ENFORCE_DETECTION = True
     
     # Thresholds (adjust these for accuracy)
-    # Thresholds (adjust these for accuracy)
-    CONFIDENCE_THRESHOLD = 0.75  # Increased for stricter security (was 0.40)
-    SIMILARITY_THRESHOLD = 0.75  # Increased for stricter matching (was 0.40)
+    CONFIDENCE_THRESHOLD = 0.75  
+    SIMILARITY_THRESHOLD = 0.75  
 
 
 # ===== ENROLLMENT =====
@@ -32,24 +31,24 @@ class LivenessConfig:
     # MediaPipe Face Mesh Settings
     MAX_NUM_FACES = 1
     REFINE_LANDMARKS = True
-    MIN_DETECTION_CONFIDENCE = 0.3  # Lowered for better detection (was 0.5)
-    MIN_TRACKING_CONFIDENCE = 0.3   # Lowered for better detection (was 0.5)
+    MIN_DETECTION_CONFIDENCE = 0.3  
+    MIN_TRACKING_CONFIDENCE = 0.3   
     
     # Blink Detection (Eye Aspect Ratio)
-    BLINK_THRESH = 0.25  # Raised - easier to detect blinks (was 0.21)
-    BLINK_MIN_FRAMES = 3  # Reduced - faster blink detection (was 6)
+    BLINK_THRESH = 0.25  
+    BLINK_MIN_FRAMES = 3  
     
     # Head Turn Detection  
-    TURN_THRESH = 15  # Reduced - easier to detect head turns (was 20)
-    HOLD_FRAMES = 30  # Reduced - faster detection (was 50)
+    TURN_THRESH = 15  
+    HOLD_FRAMES = 30  
     
     # Challenges
     CHALLENGES = ["LOOK LEFT", "LOOK RIGHT", "BLINK"]
     REQUIRED_PASSES = 3
-    CHALLENGE_TIMEOUT = 10.0  # Increased timeout (was 5.0)
+    CHALLENGE_TIMEOUT = 10.0  
     
     # Liveness Score
-    LIVENESS_SCORE_THRESHOLD = 0.70  # Lowered threshold (was 0.80)
+    LIVENESS_SCORE_THRESHOLD = 0.70  
 
 
 # Default values for easy access
