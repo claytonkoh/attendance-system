@@ -1,6 +1,7 @@
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix
 from app.db.mongodb import db as db_wrapper
@@ -133,13 +134,21 @@ class TrainingService:
         # 2. Build Model
         self.model = self.build_classifier_model()
         
+        # 3. Setup Early Stopping
+        early_stopping = EarlyStopping(
+            monitor='val_loss',          # Monitor validation loss
+            patience=5,                  # Stop if no improvement for 5 epochs
+            restore_best_weights=True,   # Restore weights from best epoch
+            verbose=1
+        )
         
-        # 3. Train
+        # 4. Train
         history = self.model.fit(
             X_train, y_train,
             epochs=50,     # Quick training for demo
             batch_size=32,
             validation_split=0.2,
+            callbacks=[early_stopping],
             verbose=0
         )
         self.history = history.history
@@ -150,7 +159,7 @@ class TrainingService:
         self.model.save(model_path)
         logger.info(f"Model saved to {model_path}")
         
-        # 4. Evaluate
+        # 5. Evaluate
         y_pred_prob = self.model.predict(X_test)
         y_pred = (y_pred_prob > 0.5).astype(int).flatten()
         
